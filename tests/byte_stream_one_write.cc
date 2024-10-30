@@ -125,6 +125,7 @@ int main()
       test.execute( BytesPushed { 3 } );
       test.execute( AvailableCapacity { 15 } );
       test.execute( BytesBuffered { 0 } );
+
     }
 
   } catch ( const exception& e ) {

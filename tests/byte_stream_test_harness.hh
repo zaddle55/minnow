@@ -6,6 +6,7 @@
 #include <concepts>
 #include <optional>
 #include <utility>
+#include <iostream>
 
 static_assert( sizeof( Reader ) == sizeof( ByteStream ),
                "Please add member variables to the ByteStream base, not the ByteStream Reader." );
