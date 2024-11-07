@@ -1,6 +1,7 @@
 #pragma once
 
 #include "byte_stream.hh"
+#include <list>
 
 class Reassembler
 {
@@ -42,4 +43,18 @@ public:
 
 private:
   ByteStream output_; // the Reassembler writes to this ByteStream
+
+  // Additional state goes here.
+  std::list<std::pair<uint64_t, std::string>> buffer_ {};
+  uint64_t bytes_pending_ {};
+  uint64_t next_index_ {};
+
+  // Return the capacity of the stream (both in the ordered stream and in the Reassembler)
+  uint64_t available_capacity() const { return output_.writer().available_capacity() - bytes_pending_; }
+
+  // Helper function to write as many bytes as possible to the output stream
+  // @param first_index the index of the first byte of the substring
+  // @param data the substring to be buffered
+  // @param is_last_substring if this substring is the end of given bytestream
+  void buffer_in(uint64_t first_index, std::string data, bool is_last_substring);
 };

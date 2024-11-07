@@ -13,6 +13,7 @@ int main()
       ByteStreamTestHarness test { "overwrite", 2 };
 
       test.execute( Push { "cat" } );
+      cout << "pushed cat" << endl;
       test.execute( IsClosed { false } );
       test.execute( BufferEmpty { false } );
       test.execute( IsFinished { false } );
@@ -20,7 +21,9 @@ int main()
       test.execute( BytesPushed { 2 } );
       test.execute( AvailableCapacity { 0 } );
       test.execute( BytesBuffered { 2 } );
+      cout << "peeking" << endl;
       test.execute( Peek { "ca" } );
+      cout << "peeked ca" << endl;
 
       test.execute( Push { "t" } );
 

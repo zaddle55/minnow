@@ -4,8 +4,7 @@
 using namespace std;
 
 ByteStream::ByteStream( uint64_t capacity ) : 
-  capacity_( capacity ), 
-  buffer_() {}
+  capacity_( capacity ) {}
 
 bool Writer::is_closed() const
 {
@@ -18,14 +17,14 @@ void Writer::push( string data )
   // Your code here.
   if (error_ || closed_) return;
   uint64_t available = available_capacity();
+  if (available == 0 || data.empty()) return;
 
-  for (auto c : data)
-  {
-    if (available == 0) break;
-    buffer_.push_back( c );
-    ++has_pushed_;
-    --available;
-  }
+  data = data.substr( 0, min( data.size(), available ) );
+  has_pushed_ += data.size();
+  has_buffered_ += data.size();
+
+  buffer_.append( data );
+
 }
 
 void Writer::close()
@@ -37,7 +36,7 @@ void Writer::close()
 uint64_t Writer::available_capacity() const
 {
   // Your code here.
-  return capacity_ - ((has_pushed_ >= has_popped_) ? has_pushed_ - has_popped_ : 0);
+  return capacity_ - has_buffered_;
 }
 
 uint64_t Writer::bytes_pushed() const
@@ -49,7 +48,7 @@ uint64_t Writer::bytes_pushed() const
 bool Reader::is_finished() const
 {
   // Your code here.
-  return buffer_.empty() && closed_;
+  return has_buffered_ == 0 && closed_;
 }
 
 uint64_t Reader::bytes_popped() const
@@ -61,25 +60,22 @@ uint64_t Reader::bytes_popped() const
 string_view Reader::peek() const
 {
   // Your code here.
-  if (buffer_.empty()) return {};
-  buffer_str_ = string().assign( buffer_.begin(), buffer_.end() );
-  return std::string_view( buffer_str_ );
+  if (error_ || has_buffered_ == 0) return {};
+  return string_view( buffer_ );
 }
 
 void Reader::pop( uint64_t len )
 {
   // Your code here.
-  if (error_ ) return;
-  while (!buffer_.empty() && len > 0)
-  {
-    buffer_.pop_front();
-    ++has_popped_;
-    --len;
-  }
+  if (error_ || len == 0 || has_buffered_ == 0) return;
+  uint64_t to_pop = min( len, bytes_buffered() );
+  has_popped_ += to_pop;
+  has_buffered_ -= to_pop;
+  buffer_ = buffer_.substr( to_pop );
 }
 
 uint64_t Reader::bytes_buffered() const
 {
   // Your code here.
-  return (has_pushed_ >= has_popped_) ? has_pushed_ - has_popped_ : 0;
+  return has_buffered_;
 }

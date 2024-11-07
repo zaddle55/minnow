@@ -28,10 +28,10 @@ protected:
   bool error_ {};
   // Additional state goes here.
   bool closed_ {};
-  std::deque<char> buffer_;
   uint64_t has_pushed_ {};
   uint64_t has_popped_ {};
-  mutable std::string buffer_str_ {};
+  uint64_t has_buffered_ {};
+  std::string buffer_ {};
 };
 
 class Writer : public ByteStream
